@@ -6,6 +6,10 @@ logging.basicConfig(level=logging.INFO, filename="logs/execution.log", filemode=
 DATA_DUMP_FILEPATH="data/dump.json"
 
 def fetch_posts_from_reddit():
+    """
+    Fetches post from Reddit using PRAW reddit API wrapper
+    first queries list od 
+    """
     reddit = praw.Reddit('WeeklyNewsletter', config_interpolation="basic")
     logging.info("Initialized Reddit instance.")
 
@@ -51,12 +55,27 @@ def fetch_posts_from_reddit():
 
         return post
 
-    user_subreddits = fetch_user_subscribed_subreddits()
+    # user_subreddits = fetch_user_subscribed_subreddits()
+    user_subreddits = ['LatestInML', 'VALORANT']
     for subreddit_name in user_subreddits:
         post = fetch_top_post_json_for_subreddit(subreddit_name)
         weekly_posts.append(post)
 
     return weekly_posts
+
+def create_md_newsletter(posts):
+    md_content = ""
+    for post in posts:
+        md_content += f"\n### {post.get('subreddit')}\n"
+        md_content += f"\n---\n"
+        md_content += f"\n#### {post.get('title')}\n"
+        if post.get('media_url'):
+            md_content += f"\n![preview_image]({post.get('media_url')})\n"
+        if post.get('selftext'):
+            md_content += f"\n{post.get('selftext')}\n"
+
+    with open("weekly_newsletter.md", 'w') as md_obj:
+        md_obj.write(md_content)
 
 def main():
     weekly_posts = fetch_posts_from_reddit()
@@ -64,6 +83,9 @@ def main():
     with open(DATA_DUMP_FILEPATH, "w") as json_obj:
         json.dump(weekly_posts, json_obj, indent=4)
     logging.info("Dumped data.")
+    logging.info("Creating markdown file...")
+    create_md_newsletter(weekly_posts)
+    logging.info("Stored weekly_newsletter.md in $PWD")
 
     logging.info("Exiting...")
 
