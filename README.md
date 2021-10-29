@@ -4,6 +4,13 @@
 
 It's a small pet project to catchup on weekly top post from subreddit a user follows.
 I made it basically to catchup on my domains of interest and what's been 'hot' this week in it.
+Why markdown? because I generally store my notes and information in md files and they are quite simple to access and use
+without any special editors or apps
+
+## Screenshot
+
+Since Reddit posts are 
+[Screenshot](Screenshot_markdown.png)
 
 ## Technology
 
