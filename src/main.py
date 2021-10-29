@@ -38,7 +38,7 @@ def fetch_posts_from_reddit():
             except AttributeError:
                logging.error("Submission doesnt have attribute selftext") 
             try:
-                post['media_url'] = submission.preview.get('images')[0].get('resolutions')[-0].get('url')
+                post['media_url'] = submission.preview.get('images')[0].get('resolutions')[-1].get('url')
             except AttributeError:
                logging.error("Submission doesnt have attribute preview") 
             if not post.get('media_url', None):
@@ -47,7 +47,7 @@ def fetch_posts_from_reddit():
                     if len(media_ids) > 1:
                         post['media_comment'] = 'More than 1 media check URL for full media'
                     post['media_type'] = submission.media_metadata.get(media_ids[0]).get('e')
-                    post['media_url'] = submission.media_metadata.get(media_ids[0]).get('p')[-3].get('u')
+                    post['media_url'] = submission.media_metadata.get(media_ids[0]).get('p')[-1].get('u')
                 except AttributeError:
                     logging.error("Submission doesnt have attribute media_metadata") 
 
@@ -55,8 +55,8 @@ def fetch_posts_from_reddit():
 
         return post
 
-    # user_subreddits = fetch_user_subscribed_subreddits()
-    user_subreddits = ['LatestInML', 'VALORANT']
+    user_subreddits = fetch_user_subscribed_subreddits()
+    # user_subreddits = ['LatestInML', 'VALORANT']
     for subreddit_name in user_subreddits:
         post = fetch_top_post_json_for_subreddit(subreddit_name)
         weekly_posts.append(post)
@@ -66,13 +66,16 @@ def fetch_posts_from_reddit():
 def create_md_newsletter(posts):
     md_content = ""
     for post in posts:
-        md_content += f"\n### {post.get('subreddit')}\n"
+        md_content += f"\n## {post.get('subreddit')}\n"
         md_content += f"\n---\n"
         md_content += f"\n#### {post.get('title')}\n"
+        md_content += "\n"
         if post.get('media_url'):
-            md_content += f"\n![preview_image]({post.get('media_url')})\n"
+            md_content += f"\n![preview]({post.get('media_url')})\n"
         if post.get('selftext'):
             md_content += f"\n{post.get('selftext')}\n"
+        md_content += f"[Link to post]({post.get('url')})"
+        md_content += "\n\n"
 
     with open("weekly_newsletter.md", 'w') as md_obj:
         md_obj.write(md_content)
